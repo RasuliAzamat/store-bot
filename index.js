@@ -80,6 +80,7 @@ function makePublication(
 }
 
 bot.hears("Пицца 🍕", async (ctx) => {
+  user["Category"] = ctx.update.message.text;
   makePublication(
     ctx,
     "https://bellapizza.tj/wp-content/uploads/2020/12/shaurmapizza-300x300.jpg",
@@ -89,39 +90,49 @@ bot.hears("Пицца 🍕", async (ctx) => {
     "Добавить в корзину 🛒",
     "Шаурма пицца"
   );
-});
-bot.on("callback_query", async (ctx) => {
-  user["Id"] = ctx.chat.id;
-  user["Name"] = ctx.from.first_name || ctx.from.last_name;
-  user["Order"] = ctx.update.callback_query.data;
-  await ctx.reply(
-    "Выберите размер",
-    Markup.keyboard([
-      [Markup.button.text("Средний"), Markup.button.text("Большой")],
-      [Markup.button.text("Супер семейный")],
-    ])
-      .oneTime()
-      .resize()
-  );
-  bot.hears(["Средний", "Большой", "Супер семейный"], async (ctx) => {
-    user["Size"] = ctx.message.text;
-    await ctx.reply("Теперь введите количество.");
-    bot.on("message", async (ctx) => {
-      if (ctx.message.text ** 1) {
-        user["Count"] = ctx.message.text;
-        return ctx.replyWithMarkdown(
-          `
-        На имя: *${user.Name}*\nЗаказ: *${user.Order}*\nКоличество: *${user.Count}*\nРазмер: *${user.Size}*\n\nДобавлено в корзину ✅
-        `,
-          Markup.inlineKeyboard([
-            [Markup.button.callback("Перейти к корзине 🛒", "Кнопка корзины")],
-          ])
-        );
-      } else {
-        return ctx.reply(
-          "Количество должно быть в цифровом формате. Повторите попытку."
-        );
-      }
+  bot.on("callback_query", async (ctx) => {
+    user["Id"] = ctx.chat.id;
+    user["Name"] = ctx.from.first_name || ctx.from.last_name;
+    user["Order"] = ctx.update.callback_query.data;
+    await ctx.reply(
+      "Выберите размер",
+      Markup.keyboard([
+        [Markup.button.text("Средний"), Markup.button.text("Большой")],
+        [Markup.button.text("Супер семейный")],
+      ])
+        .oneTime()
+        .resize()
+    );
+    bot.hears(["Средний", "Большой", "Супер семейный"], async (ctx) => {
+      user["Size"] = ctx.message.text;
+      await ctx.reply("Теперь введите количество.");
+      bot.on("message", async (ctx) => {
+        if (ctx.message.text ** 1) {
+          user["Count"] = ctx.message.text;
+          return ctx.replyWithMarkdown(
+            `
+          На имя: *${user.Name}*\nКатегория: *${user.Category}\n*Заказ: *${user.Order}*\nКоличество: *${user.Count}*\nРазмер: *${user.Size}*\n\nДобавлено в корзину ✅
+          `,
+            Markup.inlineKeyboard([
+              [
+                Markup.button.callback(
+                  "Перейти к корзине 🛒",
+                  "Кнопка корзины"
+                ),
+              ],
+            ])
+            // ctx.telegram.sendMessage(
+            //   chat_id,
+            //   `Имя: ${user.Name},\nЗаказ: ${user.Order},\nКатегория: ${user.Category},\nРазмер: ${user.Size},\nКолчичество: ${user.Count}.
+            // `
+            // )
+          );
+        } else {
+          return ctx.reply(
+            "Количество должно быть в цифровом формате. Повторите попытку."
+          );
+        }
+      });
     });
   });
 });
