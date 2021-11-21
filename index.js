@@ -6,7 +6,8 @@ const bot = new Telegraf(process.env.BOT_TOKEN);
 
 const chat_id = -765565757;
 
-const user = {};
+const userData = {};
+const orderData = {};
 
 bot.start(async (ctx) => {
   await ctx.reply(
@@ -42,6 +43,7 @@ bot.command("menu", async (ctx) => {
       .oneTime()
   );
 });
+
 bot.hears("Меню 📒", async (ctx) => {
   await ctx.reply(
     `Выберите категорию.`,
@@ -57,43 +59,27 @@ bot.hears("Меню 📒", async (ctx) => {
   );
 });
 
-function makePublication(
-  ctx,
-  img_url,
-  parse_publication,
-  parse_text,
-  caption_txt,
-  btn_txt,
-  btn_data
-) {
-  ctx.replyWithPhoto(
+bot.hears("Пицца 🍕", async (ctx) => {
+  orderData["Category"] = ctx.update.message.text;
+  orderData["Price_1"] = 72;
+  orderData["Price_2"] = 85;
+  orderData["Price_3"] = 116;
+  await ctx.replyWithPhoto(
     {
-      url: img_url,
+      url: "https://bellapizza.tj/wp-content/uploads/2020/12/shaurmapizza-300x300.jpg",
     },
     {
-      parse_mode: parse_publication,
-      parse_mode: parse_text,
-      caption: caption_txt,
-      ...Markup.inlineKeyboard([Markup.button.callback(btn_txt, btn_data)]),
+      parse_mode: "Markdown",
+      caption: `*Шаурма пицца*\nБелла Соус, Моцарелла, Пепперони, Пеперончини\n\nСредняя ${userData.Price_1}сом\nБольшая ${userData.Price_2}сом\nСупер семейная ${userData.Price_3}сом`,
+      ...Markup.inlineKeyboard([
+        Markup.button.callback("Добавить в корзину 🛒", "Шаурма пицца"),
+      ]),
     }
   );
-}
-
-bot.hears("Пицца 🍕", async (ctx) => {
-  user["Category"] = ctx.update.message.text;
-  makePublication(
-    ctx,
-    "https://bellapizza.tj/wp-content/uploads/2020/12/shaurmapizza-300x300.jpg",
-    "Markdown",
-    "HTML",
-    `<b>Шаурма пицца</b>\nБелла Соус, Моцарелла, Пепперони, Пеперончини\n\nСредняя 72сом\nБольшая 85сом\nСупер семейная 116сом`,
-    "Добавить в корзину 🛒",
-    "Шаурма пицца"
-  );
   bot.on("callback_query", async (ctx) => {
-    user["Id"] = ctx.chat.id;
-    user["Name"] = ctx.from.first_name || ctx.from.last_name;
-    user["Order"] = ctx.update.callback_query.data;
+    userData["Id"] = ctx.chat.id;
+    userData["Name"] = ctx.from.first_name || ctx.from.last_name;
+    orderData["Order"] = ctx.update.callback_query.data;
     await ctx.reply(
       "Выберите размер",
       Markup.keyboard([
@@ -104,44 +90,45 @@ bot.hears("Пицца 🍕", async (ctx) => {
         .resize()
     );
     bot.hears(["Средний", "Большой", "Супер семейный"], async (ctx) => {
-      user["Size"] = ctx.message.text;
+      orderData["Size"] = ctx.message.text;
       await ctx.reply("Теперь введите количество.");
       bot.on("message", async (ctx) => {
         if (ctx.message.text ** 1) {
-          user["Count"] = ctx.message.text;
+          orderData["Count"] = ctx.message.text ** 1;
           return ctx.replyWithMarkdown(
             `
-          На имя: *${user.Name}*\nКатегория: *${user.Category}\n*Заказ: *${user.Order}*\nКоличество: *${user.Count}*\nРазмер: *${user.Size}*\n\nДобавлено в корзину ✅
-          `,
+            На имя: *${userData.Name}*\nКатегория: *${
+              orderData.Category
+            }\n*Заказ: *${orderData.Order}*\nЦена: *${
+              orderData.Size === "Средний"
+                ? orderData.Price_1
+                : orderData.Size === "Большой"
+                ? orderData.Price_2
+                : orderData.Size === "Супер семейный"
+                ? orderData.Price_3
+                : "Не определено"
+            }*\nКоличество: *${orderData.Count}*\nРазмер: *${
+              orderData.Size
+            }*\n\nДобавлено в корзину ✅
+            `,
             Markup.inlineKeyboard([
-              [
-                Markup.button.callback(
-                  "Перейти к корзине 🛒",
-                  "Кнопка корзины"
-                ),
-              ],
+              [Markup.button.callback("Перейти к корзине 🛒", "cart_btn")],
             ])
-            // ctx.telegram.sendMessage(
-            //   chat_id,
-            //   `Имя: ${user.Name},\nЗаказ: ${user.Order},\nКатегория: ${user.Category},\nРазмер: ${user.Size},\nКолчичество: ${user.Count}.
-            // `
-            // )
           );
         } else {
           return ctx.reply(
-            "Количество должно быть в цифровом формате. Повторите попытку."
+            "Количество должно быть в цифровом формате и выше нуля. Повторите попытку."
           );
         }
       });
     });
   });
 });
-// bot.action(/.+/, (ctx) => {
-//   return (
-//     ctx.answerCbQuery(`Oh, ${ctx.match[0]}! Great choice`),
-//     ctx.answerInlineQuery(`Oh, ${ctx.match[0]}! Great choice`)
-//   );
-// });
+
+bot.action("cart_btn", (ctx) => {
+  console.log(orderData);
+  console.log(userData);
+});
 
 bot.launch();
 
