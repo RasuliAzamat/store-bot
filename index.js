@@ -8,74 +8,75 @@ const chat_id = -765565757;
 
 const userData = {};
 const orderData = {};
+const cart = {};
 
-bot.start(async (ctx) => {
-  await ctx.reply(
-    `Здравствуйте ${ctx.from.first_name}! Добро пожаловать в бот доставки еды.\n\nВыберите дальнейшее действие.`,
-    Markup.keyboard([
-      Markup.button.text("Меню 📒"),
-      Markup.button.text("Корзина 🛒"),
-    ]).resize()
-  );
-});
+const mainKeyboard = Markup.keyboard([
+  Markup.button.text("Меню 📒"),
+  Markup.button.text("Корзина 🛒"),
+]).resize();
 
-bot.hears("На главную ⬅️", async (ctx) => {
-  await ctx.reply(
-    `Здравствуйте ${ctx.from.first_name}! Добро пожаловать в бот доставки еды.\n\nВыберите дальнейшее действие.`,
-    Markup.keyboard([
-      Markup.button.text("Меню 📒"),
-      Markup.button.text("Корзина 🛒"),
-    ]).resize()
-  );
-});
+const menuKeyboard = Markup.keyboard([
+  [Markup.button.text("Пицца 🍕")],
+  [Markup.button.text("Бургеры 🍔"), Markup.button.text("Паста 🍝")],
+  [Markup.button.text("Гарниры 🍟"), Markup.button.text("Салаты 🥗")],
+  [Markup.button.text("Напитки 🥤"), Markup.button.text("Дессерты 🍰")],
+  [Markup.button.text("На главную ⬅️")],
+])
+  .resize()
+  .oneTime();
 
-bot.command("menu", async (ctx) => {
-  await ctx.reply(
-    `Выберите категорию.`,
-    Markup.keyboard([
-      [Markup.button.text("Пицца 🍕")],
-      [Markup.button.text("Бургеры 🍔"), Markup.button.text("Паста 🍝")],
-      [Markup.button.text("Гарниры 🍟"), Markup.button.text("Салаты 🥗")],
-      [Markup.button.text("Напитки 🥤"), Markup.button.text("Дессерты 🍰")],
-      [Markup.button.text("На главную ⬅️")],
-    ])
-      .resize()
-      .oneTime()
-  );
-});
+async function sayHello() {
+  bot.start(async (ctx) => {
+    await ctx.reply(
+      `Здравствуйте ${ctx.from.first_name}! Добро пожаловать в бот доставки еды.\n\nВыберите дальнейшее действие.`,
+      mainKeyboard
+    );
+  });
 
-bot.hears("Меню 📒", async (ctx) => {
-  await ctx.reply(
-    `Выберите категорию.`,
-    Markup.keyboard([
-      [Markup.button.text("Пицца 🍕")],
-      [Markup.button.text("Бургеры 🍔"), Markup.button.text("Паста 🍝")],
-      [Markup.button.text("Гарниры 🍟"), Markup.button.text("Салаты 🥗")],
-      [Markup.button.text("Напитки 🥤"), Markup.button.text("Дессерты 🍰")],
-      [Markup.button.text("На главную ⬅️")],
-    ])
-      .resize()
-      .oneTime()
-  );
-});
+  bot.hears("На главную ⬅️", async (ctx) => {
+    await ctx.reply(
+      `Здравствуйте ${ctx.from.first_name}! Добро пожаловать в бот доставки еды.\n\nВыберите дальнейшее действие.`,
+      mainKeyboard
+    );
+  });
+}
+sayHello();
 
-bot.hears("Пицца 🍕", async (ctx) => {
-  orderData["Category"] = ctx.update.message.text;
-  orderData["Price_1"] = 72;
-  orderData["Price_2"] = 85;
-  orderData["Price_3"] = 116;
-  await ctx.replyWithPhoto(
-    {
-      url: "https://bellapizza.tj/wp-content/uploads/2020/12/shaurmapizza-300x300.jpg",
-    },
-    {
-      parse_mode: "Markdown",
-      caption: `*Шаурма пицца*\nБелла Соус, Моцарелла, Пепперони, Пеперончини\n\nСредняя ${userData.Price_1}сом\nБольшая ${userData.Price_2}сом\nСупер семейная ${userData.Price_3}сом`,
-      ...Markup.inlineKeyboard([
-        Markup.button.callback("Добавить в корзину 🛒", "Шаурма пицца"),
-      ]),
-    }
-  );
+async function showMenu() {
+  bot.command("menu", async (ctx) => {
+    await ctx.reply(`Выберите категорию.`, menuKeyboard);
+  });
+
+  bot.hears("Меню 📒", async (ctx) => {
+    await ctx.reply(`Выберите категорию.`, menuKeyboard);
+  });
+}
+showMenu();
+
+async function makePublication() {
+  bot.hears("Пицца 🍕", async (ctx) => {
+    orderData["Category"] = ctx.update.message.text;
+    orderData["Price_1"] = 72;
+    orderData["Price_2"] = 85;
+    orderData["Price_3"] = 116;
+    await ctx.replyWithPhoto(
+      {
+        url: "https://bellapizza.tj/wp-content/uploads/2020/12/shaurmapizza-300x300.jpg",
+      },
+      {
+        parse_mode: "Markdown",
+        caption: `*Шаурма пицца*\nБелла Соус, Моцарелла, Пепперони, Пеперончини\n\nСредняя ${orderData.Price_1}сом\nБольшая ${orderData.Price_2}сом\nСупер семейная ${orderData.Price_3}сом`,
+        ...Markup.inlineKeyboard([
+          Markup.button.callback("Добавить в корзину 🛒", "Шаурма пицца"),
+        ]),
+      }
+    );
+    pizzaCartFunction();
+  });
+}
+makePublication();
+
+async function pizzaCartFunction() {
   bot.on("callback_query", async (ctx) => {
     userData["Id"] = ctx.chat.id;
     userData["Name"] = ctx.from.first_name || ctx.from.last_name;
@@ -123,12 +124,7 @@ bot.hears("Пицца 🍕", async (ctx) => {
       });
     });
   });
-});
-
-bot.action("cart_btn", (ctx) => {
-  console.log(orderData);
-  console.log(userData);
-});
+}
 
 bot.launch();
 
