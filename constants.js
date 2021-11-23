@@ -4,3 +4,5 @@ const commands = `
 /cart Просмотреть корзину
 /help Просмотреть все комманды
 `;
+
+module.exports.commands = commands;
