@@ -4,9 +4,7 @@ require("dotenv").config();
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 const { catalog } = require("./catalog");
-const { constants } = require("./constants");
-
-const chat_id = -765565757;
+const constants = require("./constants");
 
 const userData = {};
 const cart = {};
@@ -46,33 +44,31 @@ async function sayHello() {
       mainKeyboard
     );
   });
-
   bot.hears("На главную ⬅️", async (ctx) => {
     await ctx.reply(
-      `Здравствуйте ${ctx.from.first_name || ctx.from.last_name || ctx.from.username
-      }! Добро пожаловать в бот доставки еды.\n\nВыберите дальнейшее действие.`,
+      `Здравствуйте еще раз ${ctx.from.first_name || ctx.from.last_name || ctx.from.username
+      }! \n\nВыберите желаемое действие.`,
       mainKeyboard
     );
   });
-}
+};
 sayHello();
 
 async function showMenu() {
   bot.command("menu", async (ctx) => {
     await ctx.reply(`Выберите категорию`, menuKeyboard);
   });
-
   bot.hears("Меню 📒", async (ctx) => {
     await ctx.reply(`Выберите категорию`, menuKeyboard);
   });
-}
+};
 showMenu();
 
 async function showCommands() {
   bot.help(async (ctx) => {
     await ctx.reply(constants.commands);
   });
-}
+};
 showCommands();
 
 async function makePublication(category_food, img_src, caption_txt, food_name) {
@@ -83,10 +79,10 @@ async function makePublication(category_food, img_src, caption_txt, food_name) {
         parse_mode: "Markdown",
         caption: caption_txt,
         ...Markup.inlineKeyboard([Markup.button.callback("Добавить в корзину 🛒", food_name)]),
-      }
+      },
     );
   });
-}
+};
 
 async function addToCart(food_name, price_1, price_2, price_3) {
   bot.action(food_name, async (ctx) => {
@@ -94,7 +90,7 @@ async function addToCart(food_name, price_1, price_2, price_3) {
     userData["name"] = ctx.from.first_name || ctx.from.last_name || ctx.from.username;
     cart["order"] = ctx.update.callback_query.data;
     await ctx.reply("Выберите размер", sizeKeyboard);
-    bot.hears(["Средний", "Большой", "Семейный"], async (ctx) => {
+    bot.hears(["Средний", "Большой", "Cемейный"], async (ctx) => {
       cart["size"] = ctx.message.text;
       await ctx.reply("Теперь введите количество");
       bot.on("message", async (ctx) => {
@@ -105,7 +101,7 @@ async function addToCart(food_name, price_1, price_2, price_3) {
             contactKeyboard
           );
         } else if (ctx.message.contact) {
-          userData["phone"] = ctx.message.contact.phone_number
+          userData["phone"] = ctx.message.contact.phone_number;
           return (
             await ctx.replyWithMarkdown(
               `Имя: *${userData.name}* \nТелефон: *${userData.phone}* \nЗаказ: *${cart.order}* \nЦена: *${cart.size === "Средний"
@@ -119,7 +115,7 @@ async function addToCart(food_name, price_1, price_2, price_3) {
               }* \nРазмер: *${cart.size}* \n\nЗаказ сделан ✅ \nСейчас с вами свяжутся!
             `
             ),
-            await ctx.telegram.sendMessage(chat_id, `
+            await ctx.telegram.sendMessage(constants.chat_id, `
               Имя: *${userData.name}* \nТелефон: *${userData.phone}* \nЗаказ: *${cart.order}* \nЦена: *${cart.size === "Средний"
                 ? price_1
                 : cart.size === "Большой"
@@ -139,11 +135,11 @@ async function addToCart(food_name, price_1, price_2, price_3) {
           return await ctx.reply(
             "Количество должно быть в цифровом формате и выше нуля. Повторите попытку."
           );
-        }
+        };
       });
     });
   });
-}
+};
 
 makePublication(catalog[0].category, catalog[0].url, catalog[0].description, catalog[0].name);
 addToCart(catalog[0].name, catalog[0].price.price1, catalog[0].price.price2, catalog[0].price.price3);
