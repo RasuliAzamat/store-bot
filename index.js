@@ -119,6 +119,19 @@ async function addToCart(food_name, price_1, price_2, price_3) {
               }* \nРазмер: *${cart.size}* \n\nЗаказ сделан ✅ \nСейчас с вами свяжутся!
             `
             ),
+            await ctx.telegram.sendMessage(chat_id, `
+              Имя: *${userData.name}* \nТелефон: *${userData.phone}* \nЗаказ: *${cart.order}* \nЦена: *${cart.size === "Средний"
+                ? price_1
+                : cart.size === "Большой"
+                  ? price_2
+                  : cart.size === "Семейный"
+                    ? price_3
+                    : "Не определено"
+              }* \nКоличество: *${cart.count
+              }* \nРазмер: *${cart.size}*
+            `, {
+              parse_mode: "Markdown",
+            }),
             delete userData.id, delete userData.name, delete userData.phone, delete cart.order, delete cart.size, delete cart.count,
             await ctx.reply("Хотите заказать что-то еще?", menuKeyboard)
           );
