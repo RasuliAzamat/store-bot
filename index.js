@@ -4,12 +4,12 @@ require("dotenv").config();
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 const { catalog } = require("./catalog");
-const constants = require("./constants");
+const { constants } = require("./constants");
 
 const chat_id = -765565757;
 
-const userData = [];
-const cart = [];
+const userData = {};
+const cart = {};
 
 const mainKeyboard = Markup.keyboard([Markup.button.text("Меню 📒")]).resize();
 
@@ -88,33 +88,27 @@ async function makePublication(category_food, img_src, caption_txt, btn_data) {
   });
 }
 
-async function addToCartWithSize(food_name, price1, price2, price3) {
+async function addToCartWithSize(price1, price2, price3) {
 
-  bot.action(food_name, async (ctx) => {
+  bot.action("Шаурма пицца", async (ctx) => {
 
-    const user_chat = ctx.chat.id;
-    const user_name = ctx.from.first_name || ctx.from.last_name || ctx.from.username;
-    const user_order = ctx.update.callback_query.data;
-
-    userData.push({ id: user_chat });
-    userData.push({ name: user_name });
-    cart.push({ order: user_order });
+    userData["id"] = ctx.chat.id;
+    userData["name"] = ctx.from.first_name || ctx.from.last_name || ctx.from.username;
+    cart["order"] = ctx.update.callback_query.data;
 
     await ctx.reply("Выберите размер", sizeKeyboard);
 
     bot.hears(["Средний", "Большой", "Супер семейный"], async (ctx) => {
 
-      const food_size = ctx.message.text;
-      cart.push({ size: food_size, });
+      cart["size"] = ctx.message.text;
 
       await ctx.reply("Теперь введите количество");
 
-      bot.hears("24", async (ctx) => {
+      bot.on("message", async (ctx) => {
 
         if (ctx.message.text ** 1) {
 
-          const food_count = ctx.message.text ** 1;
-          cart.push({ count: food_count, });
+          cart["count"] = ctx.message.text;
 
           return await ctx.reply(
             "Остался последний шаг. Ведите свои телефонные номера, чтобы мы смогли связаться с вами и уточнить заказ.",
@@ -123,29 +117,29 @@ async function addToCartWithSize(food_name, price1, price2, price3) {
 
         } else if (ctx.message.contact) {
 
-          const user_phone = ctx.message.contact.phone_number;
-          userData.push({ phone: user_phone, });
+          userData["phone"] = ctx.message.contact.phone_number
 
           return (
 
             await ctx.replyWithMarkdown(
-              `Имя: *${user_name}* \nТелефон: *+${user_phone}* \nЗаказ: *${user_order}* \nЦена: *${food_size === "Средний"
+              `Имя: *${userData.name}* \nТелефон: *+${userData.phone}* \nЗаказ: *${cart.order}* \nЦена: *${cart.size === "Средний"
                 ? price1
-                : food_size === "Большой"
+                : cart.size === "Большой"
                   ? price2
-                  : food_size === "Супер семейный"
+                  : cart.size === "Супер семейный"
                     ? price3
                     : "Не определено"
-              }* \nКоличество: *${cart[2].count
-              }* \nРазмер: *${food_size}* \n\nЗаказ сделан ✅ \nСейчас с вами свяжутся!
+              }* \nКоличество: *${cart.count
+              }* \nРазмер: *${cart.size}* \n\nЗаказ сделан ✅ \nСейчас с вами свяжутся!
             `
             ),
 
+            delete userData.id, delete userData.name, delete userData.phone, delete cart.order, delete cart.size, delete cart.count,
             await ctx.reply("Хотите заказать что-то еще?", menuKeyboard)
+            
           );
 
         } else {
-
           return await ctx.reply(
             "Количество должно быть в цифровом формате и выше нуля. Повторите попытку."
           );
@@ -155,17 +149,13 @@ async function addToCartWithSize(food_name, price1, price2, price3) {
   });
 }
 
-async function addToCartWithoutSize(food_name, price) {
+async function addToCartWithoutSize(price) {
 
-  bot.action(food_name, async (ctx) => {
+  bot.action("Стейк Сэндвич", async (ctx) => {
 
-    const user_chat = ctx.chat.id;
-    const user_name = ctx.from.first_name || ctx.from.last_name || ctx.from.username;
-    const user_order = ctx.update.callback_query.data;
-
-    userData.push({ id: user_chat });
-    userData.push({ name: user_name });
-    cart.push({ order: user_order });
+    userData["id"] = ctx.chat.id;
+    userData["name"] = ctx.from.first_name || ctx.from.last_name || ctx.from.username;
+    cart["order"] = ctx.update.callback_query.data;
 
     await ctx.reply("Введите количество");
 
@@ -173,8 +163,7 @@ async function addToCartWithoutSize(food_name, price) {
 
       if (ctx.message.text ** 1) {
 
-        const food_count = ctx.message.text ** 1;
-        cart.push({ count: food_count });
+        cart["count"] = ctx.message.text;
 
         return await ctx.reply(
           "Остался последний шаг. Ведите свои телефонные номера, чтобы мы смогли связаться с вами и уточнить заказ.",
@@ -182,21 +171,21 @@ async function addToCartWithoutSize(food_name, price) {
         );
       } else if (ctx.message.contact) {
 
-        const user_phone = ctx.message.contact.phone_number;
-        userData.push({ phone: user_phone });
+        userData["phone"] = ctx.message.contact.phone_number
 
         return (
 
           await ctx.replyWithMarkdown(
-            `Имя: *${user_name}* \nТелефон: *+${user_phone}* \nЗаказ: *${user_order}* \nЦена: *${price}* \nКоличество: *${cart[1].count}* \n\nЗаказ сделан ✅ \nСейчас с вами свяжутся!
+            `Имя: *${userData.name}* \nТелефон: *+${userData.phone}* \nЗаказ: *${cart.order}* \nЦена: *${price}* \nКоличество: *${cart.count}* \n\nЗаказ сделан ✅ \nСейчас с вами свяжутся!
             `
           ),
 
+          delete userData.id, delete userData.name, delete userData.phone, delete cart.order, delete cart.count,
           await ctx.reply("Хотите заказать что-то еще?", menuKeyboard)
+
         );
 
       } else {
-
         return await ctx.reply(
           "Количество должно быть в цифровом формате и выше нуля. Повторите попытку."
         );
@@ -206,25 +195,25 @@ async function addToCartWithoutSize(food_name, price) {
 }
 
 makePublication(catalog[0].category, catalog[0].url, catalog[0].description, catalog[0].name);
-addToCartWithSize(catalog[0].name, catalog[0].price.price1, catalog[0].price.price2, catalog[0].price.price3);
+addToCartWithSize(catalog[0].price.price1, catalog[0].price.price2, catalog[0].price.price3);
 
 makePublication(catalog[1].category, catalog[1].url, catalog[1].description, catalog[1].name);
-addToCartWithoutSize(catalog[1].name, catalog[1].price);
+addToCartWithoutSize(catalog[1].price);
 
 makePublication(catalog[2].category, catalog[2].url, catalog[2].description, catalog[2].name);
-addToCartWithoutSize(catalog[2].name, catalog[2].price);
+addToCartWithoutSize(catalog[2].price);
 
 makePublication(catalog[3].category, catalog[3].url, catalog[3].description, catalog[3].name);
-addToCartWithoutSize(catalog[3].name, catalog[3].price);
+addToCartWithoutSize(catalog[3].price);
 
 makePublication(catalog[4].category, catalog[4].url, catalog[4].description, catalog[4].name);
-addToCartWithoutSize(catalog[4].name, catalog[4].price);
+addToCartWithoutSize(catalog[4].price);
 
 makePublication(catalog[5].category, catalog[5].url, catalog[5].description, catalog[5].name);
-addToCartWithoutSize(catalog[5].name, catalog[5].price);
+addToCartWithoutSize(catalog[5].price);
 
 makePublication(catalog[6].category, catalog[6].url, catalog[6].description, catalog[6].name);
-addToCartWithoutSize(catalog[6].name, catalog[6].price);
+addToCartWithoutSize(catalog[6].price);
 
 
 bot.launch();
