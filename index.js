@@ -23,7 +23,7 @@ const menuKeyboard = Markup.keyboard([
 
 const sizeKeyboard = Markup.keyboard([
   [Markup.button.text("Средний"), Markup.button.text("Большой")],
-  [Markup.button.text("Cемейный")],
+  [Markup.button.text("Семейный")],
   [Markup.button.text("На главную ⬅️")],
 ])
   .oneTime()
@@ -90,7 +90,7 @@ async function addToCart(food_name, price_1, price_2, price_3) {
     userData["name"] = ctx.from.first_name || ctx.from.last_name || ctx.from.username;
     cart["order"] = ctx.update.callback_query.data;
     await ctx.reply("Выберите размер", sizeKeyboard);
-    bot.hears(["Средний", "Большой", "Cемейный"], async (ctx) => {
+    bot.hears(["Средний", "Большой", "Семейный"], async (ctx) => {
       cart["size"] = ctx.message.text;
       await ctx.reply("Теперь введите количество");
       bot.on("message", async (ctx) => {
