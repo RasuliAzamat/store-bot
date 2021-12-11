@@ -60,7 +60,6 @@ async function addToCart(food_name, price_1, price_2, price_3) {
       order['size'] = ctx.message.text
       await ctx.reply('Теперь введите количество')
       bot.on('text', async (ctx) => {
-
         if (ctx.message.text ** 1) {
 
           order['count'] = ctx.message.text ** 1
@@ -82,7 +81,7 @@ async function addToCart(food_name, price_1, price_2, price_3) {
           for (const key in order) cart.push(order[key]), delete order[key]
           await ctx.reply('Хотите заказать что-то еще?', constants.menuKeyboard)
 
-        } else await ctx.reply('Количество должно быть в цифровом формате и выше нуля. Повторите попытку')
+        } else await ctx.reply('Введите данные в требуемом формате')
       })
     })
   })
