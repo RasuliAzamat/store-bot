@@ -1,14 +1,14 @@
 'use strict'
 
+require('dotenv').config()
 const { parse } = require('dotenv')
 const { Telegraf, Markup } = require('telegraf')
-require('dotenv').config()
 const bot = new Telegraf(process.env.BOT_TOKEN)
 
 const { catalog } = require('./catalog')
 const constants = require('./constants')
 
-const userData = []
+const userData = {}
 const order = {}
 const cart = []
 
@@ -21,6 +21,7 @@ bot.start(async (ctx) => {
     constants.mainKeyboard
   )
 })
+
 bot.hears('На главную ⬅️', async (ctx) => {
   ctx.reply(
     `Здравствуйте еще раз ${
@@ -32,10 +33,11 @@ bot.hears('На главную ⬅️', async (ctx) => {
 })
 
 bot.command('menu', async (ctx) => {
-  ctx.reply(`Выберите категорию`, constants.menuKeyboard)
+  ctx.reply('Выберите категорию', constants.menuKeyboard)
 })
+
 bot.hears('Меню 📒', async (ctx) => {
-  ctx.reply(`Выберите категорию`, constants.menuKeyboard)
+  ctx.reply('Выберите категорию', constants.menuKeyboard)
 })
 
 bot.help(async (ctx) => {
@@ -49,9 +51,7 @@ async function makePublication(category_food, img_src, caption_txt, food_name) {
       {
         parse_mode: 'Markdown',
         caption: caption_txt,
-        ...Markup.inlineKeyboard([
-          Markup.button.callback('Добавить в корзину 🛒', food_name),
-        ]),
+        ...Markup.inlineKeyboard([Markup.button.callback('Добавить в корзину 🛒', food_name)]),
       }
     )
   })
@@ -62,12 +62,11 @@ async function addToCart(food_name, price_1, price_2, price_3) {
 
     order['order'] = ctx.update.callback_query.data
     await ctx.reply('Выберите размер', constants.sizeKeyboard)
-
     bot.hears(['Средний', 'Большой', 'Семейный'], async (ctx) => {
 
       order['size'] = ctx.message.text
       await ctx.reply('Теперь введите количество')
-      bot.on('message', async (ctx) => {
+      bot.on('text', async (ctx) => {
 
         if (ctx.message.text ** 1) {
           order['count'] = ctx.message.text ** 1
@@ -82,19 +81,15 @@ async function addToCart(food_name, price_1, price_2, price_3) {
                 ? price_3
                 : 'Не определено'
             }* \nКоличество: *${order.count}* \nРазмер: *${order.size}*
-            \nДобавлено✅
+            \nДобавлено ✅
             `,
             constants.cartKeyboard
           )
 
+          for (const key in order) cart.push(order[key]), delete order[key]
           await ctx.reply('Хотите заказать что-то еще?', constants.menuKeyboard)
-          for (const key in order) cart.push({[key]: order[key]}), delete order[key]
 
-        } else {
-          return await ctx.reply(
-            'Количество должно быть в цифровом формате и выше нуля. Повторите попытку.'
-          )
-        }
+        } else return await ctx.reply('Количество должно быть в цифровом формате и выше нуля. Повторите попытку.')
       })
     })
   })
@@ -121,7 +116,47 @@ addToCart(catalog[5].name, catalog[5].price.price1, catalog[5].price.price2, cat
 makePublication(catalog[6].category, catalog[6].url, catalog[6].description, catalog[6].name)
 addToCart(catalog[6].name, catalog[6].price.price1, catalog[6].price.price2, catalog[6].price.price3)
 
-bot.action('cartBtn', async (ctx) => {})
+bot.command('cart', async (ctx) => {
+  if (cart.length !== 0) await ctx.reply(`Ваши заказы: \n\n${cart.join('\n')}`, constants.orderKeyBoard)
+  else await ctx.reply('Ваша корзина пустая. Закажите что-нибудь', constants.menuKeyboard)
+})
+
+bot.action('cartBtn', async (ctx) => {
+  if (cart.length !== 0) await ctx.reply(`Ваши заказы: \n\n${cart.join('\n')}`, constants.orderKeyBoard)
+  else await ctx.reply('Ваша корзина пустая. Закажите что-нибудь', constants.menuKeyboard)
+})
+
+bot.action('makeOrder', async (ctx) => {
+  if (cart.length !== 0) {
+
+    await ctx.reply('Оставьте свои контакты воспользовшись кнопкой', constants.contactKeyboard)
+    bot.on('contact', async (ctx) => {
+      for (const key in ctx.message.contact) userData[key] = ctx.message.contact[key]
+
+      await ctx.reply(
+        `Спасибо ${userData.first_name ?? userData.last_name}! С номерами +${
+          userData.phone_number
+        } в скором времени свяжутся для уточнения адреса доставки!`,
+        constants.mainKeyboard
+      )
+
+      await ctx.replyWithMarkdown(
+        `Данные заказа: \n\nНа имя: *${
+          userData.first_name ?? userData.last_name
+        }* \nТелефон: *+${userData.phone_number}* \nЗаказ: *\n${cart.join(
+          '\n'
+        )}*`
+      )
+    })
+  }
+  else await ctx.reply('Вы еще не заказли ничего. Закажите', constants.menuKeyboard)
+})
+
+bot.action('cleanCart', async (ctx) => {
+  cart.length = 0
+  for (const key in userData) delete userData[key]
+  await ctx.reply('Ваша корзина очищена')
+})
 
 bot.launch()
 
