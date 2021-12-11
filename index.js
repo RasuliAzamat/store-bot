@@ -5,7 +5,6 @@ const { parse } = require('dotenv')
 const { Telegraf, Markup } = require('telegraf')
 const bot = new Telegraf(process.env.BOT_TOKEN)
 
-const { catalog } = require('./catalog')
 const constants = require('./constants')
 
 const userData = {}
@@ -95,26 +94,26 @@ async function addToCart(food_name, price_1, price_2, price_3) {
   })
 }
 
-makePublication(catalog[0].category, catalog[0].url, catalog[0].description, catalog[0].name)
-addToCart(catalog[0].name, catalog[0].price.price1, catalog[0].price.price2, catalog[0].price.price3)
+makePublication(constants.catalog[0].category, constants.catalog[0].url, constants.catalog[0].description, constants.catalog[0].name)
+addToCart(constants.catalog[0].name, constants.catalog[0].price.price1, constants.catalog[0].price.price2, constants.catalog[0].price.price3)
 
-makePublication(catalog[1].category, catalog[1].url, catalog[1].description, catalog[1].name)
-addToCart(catalog[1].name, catalog[1].price.price1, catalog[1].price.price2, catalog[1].price.price3)
+makePublication(constants.catalog[1].category, constants.catalog[1].url, constants.catalog[1].description, constants.catalog[1].name)
+addToCart(constants.catalog[1].name, constants.catalog[1].price.price1, constants.catalog[1].price.price2, constants.catalog[1].price.price3)
 
-makePublication(catalog[2].category, catalog[2].url, catalog[2].description, catalog[2].name)
-addToCart(catalog[2].name, catalog[2].price.price1, catalog[2].price.price2, catalog[2].price.price3)
+makePublication(constants.catalog[2].category, constants.catalog[2].url, constants.catalog[2].description, constants.catalog[2].name)
+addToCart(constants.catalog[2].name, constants.catalog[2].price.price1, constants.catalog[2].price.price2, constants.catalog[2].price.price3)
 
-makePublication(catalog[3].category, catalog[3].url, catalog[3].description, catalog[3].name)
-addToCart(catalog[3].name, catalog[3].price.price1, catalog[3].price.price2, catalog[3].price.price3)
+makePublication(constants.catalog[3].category, constants.catalog[3].url, constants.catalog[3].description, constants.catalog[3].name)
+addToCart(constants.catalog[3].name, constants.catalog[3].price.price1, constants.catalog[3].price.price2, constants.catalog[3].price.price3)
 
-makePublication(catalog[4].category, catalog[4].url, catalog[4].description, catalog[4].name)
-addToCart(catalog[4].name, catalog[4].price.price1, catalog[4].price.price2, catalog[4].price.price3)
+makePublication(constants.catalog[4].category, constants.catalog[4].url, constants.catalog[4].description, constants.catalog[4].name)
+addToCart(constants.catalog[4].name, constants.catalog[4].price.price1, constants.catalog[4].price.price2, constants.catalog[4].price.price3)
 
-makePublication(catalog[5].category, catalog[5].url, catalog[5].description, catalog[5].name)
-addToCart(catalog[5].name, catalog[5].price.price1, catalog[5].price.price2, catalog[5].price.price3)
+makePublication(constants.catalog[5].category, constants.catalog[5].url, constants.catalog[5].description, constants.catalog[5].name)
+addToCart(constants.catalog[5].name, constants.catalog[5].price.price1, constants.catalog[5].price.price2, constants.catalog[5].price.price3)
 
-makePublication(catalog[6].category, catalog[6].url, catalog[6].description, catalog[6].name)
-addToCart(catalog[6].name, catalog[6].price.price1, catalog[6].price.price2, catalog[6].price.price3)
+makePublication(constants.catalog[6].category, constants.catalog[6].url, constants.catalog[6].description, constants.catalog[6].name)
+addToCart(constants.catalog[6].name, constants.catalog[6].price.price1, constants.catalog[6].price.price2, constants.catalog[6].price.price3)
 
 bot.command('cart', async (ctx) => {
   if (cart.length !== 0) await ctx.reply(`Ваши заказы: \n\n${cart.join('\n')}`, constants.orderKeyBoard)
