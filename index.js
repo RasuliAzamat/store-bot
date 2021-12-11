@@ -119,6 +119,9 @@ bot.action('makeOrder', async (ctx) => {
           '\n'
         )}*`
       )
+
+      cart.length = 0
+      for (const key in userData) delete userData[key]
     })
   }
   else await ctx.reply('Вы еще не заказли ничего. Закажите', constants.menuKeyboard)
