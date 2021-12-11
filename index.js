@@ -12,7 +12,7 @@ const order = {}
 const cart = []
 
 bot.start(async (ctx) => {
-  ctx.reply(
+  await ctx.reply(
     `Здравствуйте ${
       ctx.from.first_name ?? ctx.from.last_name ?? ctx.from.username
     }! Добро пожаловать в бот доставки еды.
@@ -22,7 +22,7 @@ bot.start(async (ctx) => {
 })
 
 bot.hears('На главную ⬅️', async (ctx) => {
-  ctx.reply(
+  await ctx.reply(
     `Здравствуйте еще раз ${
       ctx.from.first_name ?? ctx.from.last_name ?? ctx.from.username
     }!
@@ -31,21 +31,15 @@ bot.hears('На главную ⬅️', async (ctx) => {
   )
 })
 
-bot.command('menu', async (ctx) => {
-  ctx.reply('Выберите категорию', constants.menuKeyboard)
-})
+bot.command('menu', async (ctx) => {await ctx.reply('Выберите категорию', constants.menuKeyboard)})
 
-bot.hears('Меню 📒', async (ctx) => {
-  ctx.reply('Выберите категорию', constants.menuKeyboard)
-})
+bot.hears('Меню 📒', async (ctx) => {await ctx.reply('Выберите категорию', constants.menuKeyboard)})
 
-bot.help(async (ctx) => {
-  ctx.reply(constants.commands)
-})
+bot.help(async (ctx) => {await ctx.reply(constants.commands)})
 
 async function makePublication(category_food, img_src, caption_txt, food_name) {
   bot.hears(category_food, async (ctx) => {
-    ctx.replyWithPhoto(
+    await ctx.replyWithPhoto(
       { url: img_src },
       {
         parse_mode: 'Markdown',
@@ -57,8 +51,7 @@ async function makePublication(category_food, img_src, caption_txt, food_name) {
 }
 
 async function addToCart(food_name, price_1, price_2, price_3) {
-
-  bot.action(food_name,  async (ctx) => {
+  bot.action(food_name, async (ctx) => {
 
     order['order'] = ctx.update.callback_query.data
     await ctx.reply('Выберите размер', constants.sizeKeyboard)
@@ -89,12 +82,11 @@ async function addToCart(food_name, price_1, price_2, price_3) {
           for (const key in order) cart.push(order[key]), delete order[key]
           await ctx.reply('Хотите заказать что-то еще?', constants.menuKeyboard)
 
-        } else return await ctx.reply('Количество должно быть в цифровом формате и выше нуля. Повторите попытку.')
+        } else await ctx.reply('Количество должно быть в цифровом формате и выше нуля. Повторите попытку')
       })
     })
   })
 }
-
 
 bot.command('cart', async (ctx) => {
   if (cart.length !== 0) await ctx.reply(`Ваши заказы: \n\n${cart.join('\n')}`, constants.orderKeyBoard)
@@ -107,7 +99,6 @@ bot.action('cartBtn', async (ctx) => {
 })
 
 bot.action('makeOrder', async (ctx) => {
-
   if (cart.length !== 0) {
 
     await ctx.reply('Оставьте свои контакты воспользовшись кнопкой', constants.contactKeyboard)
