@@ -62,15 +62,15 @@ async function addToCart(food_name, price_1, price_2, price_3) {
       bot.on('text', async (ctx) => {
         if (ctx.message.text ** 1) {
 
-          order['count'] = ctx.message.text ** 1
+          order['count'] = ctx.message.text ** 1 + ' штук'
           await ctx.replyWithMarkdown(
             `Заказ: *${order.order}* \nЦена: *${
               order.size === 'Средний'
-                ? price_1
+                ? (price_1, (order['price'] = price_1 + ' сомон'))
                 : order.size === 'Большой'
-                ? price_2
+                ? (price_2, (order['price'] = price_2 + ' сомон'))
                 : order.size === 'Семейный'
-                ? price_3
+                ? (price_3, (order['price'] = price_3 +  'сомон'))
                 : 'Не определено'
             }* \nКоличество: *${order.count}* \nРазмер: *${order.size}*
             \nДобавлено ✅
