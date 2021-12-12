@@ -10,6 +10,7 @@ const constants = require('./constants')
 const userData = {}
 const order = {}
 const cart = []
+const orderPrice = []
 
 bot.start(async (ctx) => {
   await ctx.reply(
@@ -62,7 +63,7 @@ async function addToCart(food_name, price_1, price_2, price_3) {
       bot.on('text', async (ctx) => {
         if (ctx.message.text ** 1) {
 
-          order['count'] = ctx.message.text ** 1 + ' штук'
+          order['count'] = ctx.message.text ** 1 + ' шт'
           await ctx.replyWithMarkdown(
             `Заказ: *${order.order}* \nЦена: *${
               order.size === 'Средний'
@@ -70,7 +71,7 @@ async function addToCart(food_name, price_1, price_2, price_3) {
                 : order.size === 'Большой'
                 ? (price_2, (order['price'] = price_2 + ' сомон'))
                 : order.size === 'Семейный'
-                ? (price_3, (order['price'] = price_3 +  'сомон'))
+                ? (price_3, (order['price'] = price_3 + ' сомон'))
                 : 'Не определено'
             }* \nКоличество: *${order.count}* \nРазмер: *${order.size}*
             \nДобавлено ✅
@@ -78,6 +79,7 @@ async function addToCart(food_name, price_1, price_2, price_3) {
             constants.cartKeyboard
           )
 
+          orderPrice.push({'price': order.price, 'count': order.count})
           for (const key in order) cart.push(order[key]), delete order[key]
           await ctx.reply('Хотите заказать что-то еще?', constants.menuKeyboard)
 
@@ -88,18 +90,25 @@ async function addToCart(food_name, price_1, price_2, price_3) {
 }
 
 bot.command('cart', async (ctx) => {
-  if (cart.length !== 0) await ctx.reply(`Ваши заказы: \n\n${cart.join('\n')}`, constants.orderKeyBoard)
+  if (cart.length !== 0) {
+    const price = orderPrice.reduce((sum, current) => sum + parseInt(current.price) * parseInt(current.count), 0)
+    await ctx.reply(`Ваши заказы: \n\n${cart.join('\n')} \n\nИтого: ${price} сомон`, constants.orderKeyBoard)
+  }
   else await ctx.reply('Ваша корзина пустая. Закажите что-нибудь', constants.menuKeyboard)
 })
 
 bot.action('cartBtn', async (ctx) => {
-  if (cart.length !== 0) await ctx.reply(`Ваши заказы: \n\n${cart.join('\n')}`, constants.orderKeyBoard)
+  if (cart.length !== 0) {
+    const price = orderPrice.reduce((sum, current) => sum + parseInt(current.price) * parseInt(current.count), 0)
+    await ctx.reply(`Ваши заказы: \n\n${cart.join('\n')} \n\nИтого: ${price} сомон`, constants.orderKeyBoard)
+  }
   else await ctx.reply('Ваша корзина пустая. Закажите что-нибудь', constants.menuKeyboard)
 })
 
 bot.action('makeOrder', async (ctx) => {
   if (cart.length !== 0) {
 
+    const price = orderPrice.reduce((sum, current) => sum + parseInt(current.price) * parseInt(current.count), 0)
     await ctx.reply('Оставьте свои контакты воспользовшись кнопкой', constants.contactKeyboard)
     bot.on('contact', async (ctx) => {
 
@@ -111,15 +120,18 @@ bot.action('makeOrder', async (ctx) => {
         constants.mainKeyboard
       )
 
-      await ctx.replyWithMarkdown(
+      await ctx.telegram.sendMessage(
+        constants.chat_id,
         `Данные заказа: \n\nНа имя: *${
           userData.first_name ?? userData.last_name
         }* \nТелефон: *+${userData.phone_number}* \nЗаказ: *\n${cart.join(
           '\n'
-        )}*`
+        )}*\n\nИтого: *${price} сомон*`,
+        { parse_mode: 'Markdown' }
       )
 
       cart.length = 0
+      orderPrice.length = 0
       for (const key in userData) delete userData[key]
     })
   }
@@ -128,6 +140,7 @@ bot.action('makeOrder', async (ctx) => {
 
 bot.action('cleanCart', async (ctx) => {
   cart.length = 0
+  orderPrice.length = 0
   for (const key in userData) delete userData[key]
   await ctx.reply('Ваша корзина очищена')
 })
