@@ -12,58 +12,54 @@ const order = {}
 const cart = []
 const orderPrice = []
 
-bot.start(async (ctx) => {
-  await ctx.reply(
-    `Здравствуйте ${
-      ctx.from.first_name ?? ctx.from.last_name ?? ctx.from.username
-    }! Добро пожаловать в бот доставки еды.
-    \nВыберите дальнейшее действие.`,
-    constants.mainKeyboard
-  )
-})
+bot.start(async (ctx) => await ctx.reply(
+  `Здравствуйте ${
+    ctx.from.first_name ?? ctx.from.last_name ?? ctx.from.username
+  }! Добро пожаловать в бот доставки еды.
+  \nВыберите дальнейшее действие.`,
+  constants.mainKeyboard
+))
 
-bot.hears('На главную ⬅️', async (ctx) => {
-  await ctx.reply(
-    `Здравствуйте еще раз ${
-      ctx.from.first_name ?? ctx.from.last_name ?? ctx.from.username
-    }!
-    \nВыберите желаемое действие.`,
-    constants.mainKeyboard
-  )
-})
+bot.hears('На главную ⬅️', async (ctx) => await ctx.reply(
+  `Здравствуйте еще раз ${
+    ctx.from.first_name ?? ctx.from.last_name ?? ctx.from.username
+  }!
+  \nВыберите желаемое действие.`,
+  constants.mainKeyboard
+))
 
-bot.command('menu', async (ctx) => {await ctx.reply('Выберите категорию', constants.menuKeyboard)})
+bot.command('menu', async (ctx) => await ctx.reply('Выберите категорию', constants.menuKeyboard))
 
-bot.hears('Меню 📒', async (ctx) => {await ctx.reply('Выберите категорию', constants.menuKeyboard)})
+bot.hears('Меню 📒', async (ctx) => await ctx.reply('Выберите категорию', constants.menuKeyboard))
 
-bot.help(async (ctx) => {await ctx.reply(constants.commands)})
+bot.help(async (ctx) => await ctx.reply(constants.commands))
 
 async function makePublication(category_food, img_src, caption_txt, food_name) {
-  bot.hears(category_food, async (ctx) => {
-    await ctx.replyWithPhoto(
-      { url: img_src },
-      {
-        parse_mode: 'Markdown',
-        caption: caption_txt,
-        ...Markup.inlineKeyboard([Markup.button.callback('Добавить в корзину 🛒', food_name)]),
-      }
-    )
-  })
+  bot.hears(category_food, async (ctx) => await ctx.replyWithPhoto(
+    { url: img_src },
+    {
+      parse_mode: 'Markdown',
+      caption: caption_txt,
+      ...Markup.inlineKeyboard([Markup.button.callback('Добавить в корзину 🛒', food_name)]),
+    }
+  ))
 }
 
 async function addToCart(food_name, price_1, price_2, price_3) {
   bot.action(food_name, async (ctx) => {
-
     order['order'] = ctx.update.callback_query.data
-    await ctx.reply('Выберите размер', constants.sizeKeyboard)
-    bot.hears(['Средний', 'Большой', 'Семейный'], async (ctx) => {
 
+    await ctx.reply('Выберите размер', constants.sizeKeyboard)
+
+    bot.hears(['Средний', 'Большой', 'Семейный'], async (ctx) => {
       order['size'] = ctx.message.text
+
       await ctx.reply('Теперь введите количество')
+
       bot.on('text', async (ctx) => {
         if (ctx.message.text ** 1) {
-
           order['count'] = ctx.message.text ** 1 + ' шт'
+
           await ctx.replyWithMarkdown(
             `Заказ: *${order.order}* \nЦена: *${
               order.size === 'Средний'
@@ -79,8 +75,9 @@ async function addToCart(food_name, price_1, price_2, price_3) {
             constants.cartKeyboard
           )
 
-          orderPrice.push({'price': order.price, 'count': order.count})
+          orderPrice.push({price: order.price, count: order.count})
           for (const key in order) cart.push(order[key]), delete order[key]
+
           await ctx.reply('Хотите заказать что-то еще?', constants.menuKeyboard)
 
         } else await ctx.reply('Введите данные в требуемом формате')
@@ -107,12 +104,12 @@ bot.action('cartBtn', async (ctx) => {
 
 bot.action('makeOrder', async (ctx) => {
   if (cart.length !== 0) {
-
     const price = orderPrice.reduce((sum, current) => sum + parseInt(current.price) * parseInt(current.count), 0)
+
     await ctx.reply('Оставьте свои контакты воспользовшись кнопкой', constants.contactKeyboard)
     bot.on('contact', async (ctx) => {
-
       for (const key in ctx.message.contact) userData[key] = ctx.message.contact[key]
+
       await ctx.reply(
         `Спасибо ${userData.first_name ?? userData.last_name}! С номерами +${
           userData.phone_number
