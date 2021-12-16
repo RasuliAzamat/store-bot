@@ -112,7 +112,7 @@ async function addToCart(foodName, priceOne, priceTwo, priceThree) {
           if (ctx.message.text ** 1) {
             orderData['count'] = ctx.message.text ** 1 + ' шт'
 
-            showOrder(ctx, priceOne, priceTwo, priceThree)
+            showLastOrder(ctx, priceOne, priceTwo, priceThree)
 
             orderPrices.push({ price: orderData.price, count: orderData.count, })
             for (const key in orderData) cartData.push(orderData[key]), delete orderData[key]
@@ -363,7 +363,7 @@ async function sendOrderToGroup(ctx) {
   }
 }
 
-async function showOrder(ctx, priceOne, priceTwo, priceThree) {
+async function showLastOrder(ctx, priceOne, priceTwo, priceThree) {
   try {
 
     await ctx.replyWithMarkdown(
