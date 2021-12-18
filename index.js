@@ -95,10 +95,10 @@ async function addPost(foodCategory, imageSource, captiontext, foodName) {
   }
 }
 
-async function addToCart(foodName, priceOne, priceTwo, priceThree) {
+async function addToCart(priceOne, priceTwo, priceThree) {
   try {
 
-    bot.action(foodName, async context => {
+    bot.on('callback_query', async context => {
       orderData['order'] = await context.update.callback_query.data
 
       await context.reply('Выберите размер', constants.sizeKeyboard)
@@ -201,103 +201,103 @@ bot.action('cleanCart', async context => {
 })
 
 addPost(catalog[0].category, catalog[0].url, catalog[0].description, catalog[0].name)
-addToCart(catalog[0].name, catalog[0].price.price1, catalog[0].price.price2, catalog[0].price.price3)
+addToCart(catalog[0].price.price1, catalog[0].price.price2, catalog[0].price.price3)
 
 addPost(catalog[1].category, catalog[1].url, catalog[1].description, catalog[1].name)
-addToCart(catalog[1].name, catalog[1].price.price1, catalog[1].price.price2, catalog[1].price.price3)
+addToCart(catalog[1].price.price1, catalog[1].price.price2, catalog[1].price.price3)
 
 addPost(catalog[2].category, catalog[2].url, catalog[2].description, catalog[2].name)
-addToCart(catalog[2].name, catalog[2].price.price1, catalog[2].price.price2, catalog[2].price.price3)
+addToCart(catalog[2].price.price1, catalog[2].price.price2, catalog[2].price.price3)
 
 addPost(catalog[3].category, catalog[3].url, catalog[3].description, catalog[3].name)
-addToCart(catalog[3].name, catalog[3].price.price1, catalog[3].price.price2, catalog[3].price.price3)
+addToCart(catalog[3].price.price1, catalog[3].price.price2, catalog[3].price.price3)
 
 addPost(catalog[4].category, catalog[4].url, catalog[4].description, catalog[4].name)
-addToCart(catalog[4].name, catalog[4].price.price1, catalog[4].price.price2, catalog[4].price.price3)
+addToCart(catalog[4].price.price1, catalog[4].price.price2, catalog[4].price.price3)
 
 addPost(catalog[5].category, catalog[5].url, catalog[5].description, catalog[5].name)
-addToCart(catalog[5].name, catalog[5].price.price1, catalog[5].price.price2, catalog[5].price.price3)
+addToCart(catalog[5].price.price1, catalog[5].price.price2, catalog[5].price.price3)
 
 addPost(catalog[6].category, catalog[6].url, catalog[6].description, catalog[6].name)
-addToCart(catalog[6].name, catalog[6].price.price1, catalog[6].price.price2, catalog[6].price.price3)
+addToCart(catalog[6].price.price1, catalog[6].price.price2, catalog[6].price.price3)
 
 addPost(catalog[7].category, catalog[7].url, catalog[7].description, catalog[7].name)
-addToCart(catalog[7].name, catalog[7].price.price1, catalog[7].price.price2, catalog[7].price.price3)
+addToCart(catalog[7].price.price1, catalog[7].price.price2, catalog[7].price.price3)
 
 addPost(catalog[8].category, catalog[8].url, catalog[8].description, catalog[8].name)
-addToCart(catalog[8].name, catalog[8].price.price1, catalog[8].price.price2, catalog[8].price.price3)
+addToCart(catalog[8].price.price1, catalog[8].price.price2, catalog[8].price.price3)
 
 addPost(catalog[9].category, catalog[9].url, catalog[9].description, catalog[9].name)
-addToCart(catalog[9].name, catalog[9].price.price1, catalog[9].price.price2, catalog[9].price.price3)
+addToCart(catalog[9].price.price1, catalog[9].price.price2, catalog[9].price.price3)
 
 addPost(catalog[10].category, catalog[10].url, catalog[10].description, catalog[10].name)
-addToCart(catalog[10].name, catalog[10].price.price1, catalog[10].price.price2, catalog[10].price.price3)
+addToCart(catalog[10].price.price1, catalog[10].price.price2, catalog[10].price.price3)
 
 addPost(catalog[11].category, catalog[11].url, catalog[11].description, catalog[11].name)
-addToCart(catalog[11].name, catalog[11].price.price1, catalog[11].price.price2, catalog[11].price.price3)
+addToCart(catalog[11].price.price1, catalog[11].price.price2, catalog[11].price.price3)
 
 addPost(catalog[12].category, catalog[12].url, catalog[12].description, catalog[12].name)
-addToCart(catalog[12].name, catalog[12].price.price1, catalog[12].price.price2, catalog[12].price.price3)
+addToCart(catalog[12].price.price1, catalog[12].price.price2, catalog[12].price.price3)
 
 addPost(catalog[13].category, catalog[13].url, catalog[13].description, catalog[13].name)
-addToCart(catalog[13].name, catalog[13].price.price1, catalog[13].price.price2, catalog[13].price.price3)
+addToCart(catalog[13].price.price1, catalog[13].price.price2, catalog[13].price.price3)
 
 addPost(catalog[14].category, catalog[14].url, catalog[14].description, catalog[14].name)
-addToCart(catalog[14].name, catalog[14].price.price1, catalog[14].price.price2, catalog[14].price.price3)
+addToCart(catalog[14].price.price1, catalog[14].price.price2, catalog[14].price.price3)
 
 addPost(catalog[15].category, catalog[15].url, catalog[15].description, catalog[15].name)
-addToCart(catalog[15].name, catalog[15].price.price1, catalog[15].price.price2, catalog[15].price.price3)
+addToCart(catalog[15].price.price1, catalog[15].price.price2, catalog[15].price.price3)
 
 addPost(catalog[16].category, catalog[16].url, catalog[16].description, catalog[16].name)
-addToCart(catalog[16].name, catalog[16].price.price1, catalog[16].price.price2, catalog[16].price.price3)
+addToCart(catalog[16].price.price1, catalog[16].price.price2, catalog[16].price.price3)
 
 addPost(catalog[17].category, catalog[17].url, catalog[17].description, catalog[17].name)
-addToCart(catalog[17].name, catalog[17].price.price1, catalog[17].price.price2, catalog[17].price.price3)
+addToCart(catalog[17].price.price1, catalog[17].price.price2, catalog[17].price.price3)
 
 addPost(catalog[18].category, catalog[18].url, catalog[18].description, catalog[18].name)
-addToCart(catalog[18].name, catalog[18].price.price1, catalog[18].price.price2, catalog[18].price.price3)
+addToCart(catalog[18].price.price1, catalog[18].price.price2, catalog[18].price.price3)
 
 addPost(catalog[19].category, catalog[19].url, catalog[19].description, catalog[19].name)
-addToCart(catalog[19].name, catalog[19].price.price1, catalog[19].price.price2, catalog[19].price.price3)
+addToCart(catalog[19].price.price1, catalog[19].price.price2, catalog[19].price.price3)
 
 addPost(catalog[20].category, catalog[20].url, catalog[20].description, catalog[20].name)
-addToCart(catalog[20].name, catalog[20].price.price1, catalog[20].price.price2, catalog[20].price.price3)
+addToCart(catalog[20].price.price1, catalog[20].price.price2, catalog[20].price.price3)
 
 addPost(catalog[21].category, catalog[21].url, catalog[21].description, catalog[21].name)
-addToCart(catalog[21].name, catalog[21].price.price1, catalog[21].price.price2, catalog[21].price.price3)
+addToCart(catalog[21].price.price1, catalog[21].price.price2, catalog[21].price.price3)
 
 addPost(catalog[22].category, catalog[22].url, catalog[22].description, catalog[22].name)
-addToCart(catalog[22].name, catalog[22].price.price1, catalog[22].price.price2, catalog[22].price.price3)
+addToCart(catalog[22].price.price1, catalog[22].price.price2, catalog[22].price.price3)
 
 addPost(catalog[23].category, catalog[23].url, catalog[23].description, catalog[23].name)
-addToCart(catalog[23].name, catalog[23].price.price1, catalog[23].price.price2, catalog[23].price.price3)
+addToCart(catalog[23].price.price1, catalog[23].price.price2, catalog[23].price.price3)
 
 addPost(catalog[24].category, catalog[24].url, catalog[24].description, catalog[24].name)
-addToCart(catalog[24].name, catalog[24].price.price1, catalog[24].price.price2, catalog[24].price.price3)
+addToCart(catalog[24].price.price1, catalog[24].price.price2, catalog[24].price.price3)
 
 addPost(catalog[25].category, catalog[25].url, catalog[25].description, catalog[25].name)
-addToCart(catalog[25].name, catalog[25].price.price1, catalog[25].price.price2, catalog[25].price.price3)
+addToCart(catalog[25].price.price1, catalog[25].price.price2, catalog[25].price.price3)
 
 addPost(catalog[26].category, catalog[26].url, catalog[26].description, catalog[26].name)
-addToCart(catalog[26].name, catalog[26].price.price1, catalog[26].price.price2, catalog[26].price.price3)
+addToCart(catalog[26].price.price1, catalog[26].price.price2, catalog[26].price.price3)
 
 addPost(catalog[27].category, catalog[27].url, catalog[27].description, catalog[27].name)
-addToCart(catalog[27].name, catalog[27].price.price1, catalog[27].price.price2, catalog[27].price.price3)
+addToCart(catalog[27].price.price1, catalog[27].price.price2, catalog[27].price.price3)
 
 addPost(catalog[28].category, catalog[28].url, catalog[28].description, catalog[28].name)
-addToCart(catalog[28].name, catalog[28].price.price1, catalog[28].price.price2, catalog[28].price.price3)
+addToCart(catalog[28].price.price1, catalog[28].price.price2, catalog[28].price.price3)
 
 addPost(catalog[29].category, catalog[29].url, catalog[29].description, catalog[29].name)
-addToCart(catalog[29].name, catalog[29].price.price1, catalog[29].price.price2, catalog[29].price.price3)
+addToCart(catalog[29].price.price1, catalog[29].price.price2, catalog[29].price.price3)
 
 addPost(catalog[30].category, catalog[30].url, catalog[30].description, catalog[30].name)
-addToCart(catalog[30].name, catalog[30].price.price1, catalog[30].price.price2, catalog[30].price.price3)
+addToCart(catalog[30].price.price1, catalog[30].price.price2, catalog[30].price.price3)
 
 addPost(catalog[31].category, catalog[31].url, catalog[31].description, catalog[31].name)
-addToCart(catalog[31].name, catalog[31].price.price1, catalog[31].price.price2, catalog[31].price.price3)
+addToCart(catalog[31].price.price1, catalog[31].price.price2, catalog[31].price.price3)
 
 addPost(catalog[32].category, catalog[32].url, catalog[32].description, catalog[32].name)
-addToCart(catalog[32].name, catalog[32].price.price1, catalog[32].price.price2, catalog[32].price.price3)
+addToCart(catalog[32].price.price1, catalog[32].price.price2, catalog[32].price.price3)
 
 async function deleteItemsInObject(objectName) {
   try {
